@@ -1,0 +1,19 @@
+services:
+  database:
+    image: mysql:8.4.0
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+    volumes:
+      - membership-system:/var/lib/mysql
+    ports:
+      - 33061:3306
+    networks:
+      - default
+
+networks:
+  default:
+    name: membership-system
+
+volumes:
+  membership-system:

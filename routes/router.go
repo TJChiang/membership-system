@@ -1,6 +1,9 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"membership-system/pkg/oauth2"
+)
 
 func SetupRoutes() *gin.Engine {
 	router := gin.Default()
@@ -10,6 +13,8 @@ func SetupRoutes() *gin.Engine {
 			"message": "pong",
 		})
 	})
+
+	oauth2.Routes(router)
 
 	return router
 }

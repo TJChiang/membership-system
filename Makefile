@@ -13,6 +13,10 @@ migrate-up:
 migrate-down:
 	migrate -path ${MIGRATION_DIR} -database "${MIGRATION_TARGET}://root:${DATABASE_ROOT_PASSWORD}@tcp(${DATABASE_URL})/${DATABASE_SCHEMA}" down
 
+.PHONY: migrate-force
+migrate-force:
+	migrate -path ${MIGRATION_DIR} -database "${MIGRATION_TARGET}://root:${DATABASE_ROOT_PASSWORD}@tcp(${DATABASE_URL})/${DATABASE_SCHEMA}" force $(MIGRATION_VERSION)
+
 .PHONY: create-migration
 create-migration:
 	migrate create -tz ${TZ} -ext sql -dir ${MIGRATION_DIR} $(MIGRATION_NAME)

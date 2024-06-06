@@ -7,7 +7,7 @@ import (
 func Routes(r *gin.Engine) {
 	router := r.Group("/oauth2")
 	// Clients
-	router.GET("/clients")
+	router.GET("/clients", GetClients)
 	router.GET("/client/:client_id", GetClient)
 	router.POST("/client", CreateClient)
 	router.PUT("/client/:client_id")

@@ -1,8 +1,15 @@
 package main
 
-import "membership-system/routes"
+import (
+	"github.com/joho/godotenv"
+	"membership-system/routes"
+)
 
 func main() {
+	if godotenv.Load() != nil {
+		panic("Error loading .env file")
+	}
+
 	router := routes.SetupRoutes()
 	err := router.Run(":8080")
 

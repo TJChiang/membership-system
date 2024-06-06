@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type ClientRequest struct {
+type CreateClientRequest struct {
 	ClientId     string   `form:"client_id" json:"client_id" binding:"required"`
 	ClientSecret string   `form:"client_secret" json:"client_secret" binding:"required"`
 	ClientName   string   `form:"client_name" json:"client_name" binding:"required"`
@@ -18,7 +18,7 @@ type ClientRequest struct {
 }
 
 func CreateClient(c *gin.Context) {
-	body := &ClientRequest{}
+	body := &CreateClientRequest{}
 
 	if err := c.ShouldBindBodyWithJSON(body); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{

@@ -4,33 +4,38 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"membership-system/database"
-	"membership-system/pkg/oauth2"
+	"membership-system/internal"
 	"net/http"
-	"strings"
 )
 
-type Client struct {
-	ClientId     string   `json:"client_id"`
+type ClientRequest struct {
+	ClientId     string   `form:"client_id" json:"client_id" binding:"required"`
+	ClientSecret string   `form:"client_secret" json:"client_secret" binding:"required"`
 	ClientName   string   `form:"client_name" json:"client_name" binding:"required"`
-	Scope        []string `form:"scope" json:"scope" binding:"required"`
+	Scope        string   `form:"scope" json:"scope" binding:"required"`
 	GrantTypes   []string `form:"grant_types" json:"grant_types" binding:"required"`
 	RedirectUris []string `form:"redirect_uris" json:"redirect_uris" binding:"required"`
 }
 
 func CreateClient(c *gin.Context) {
-	body := &Client{}
+	body := &ClientRequest{}
 
-	if err := c.BindJSON(body); err != nil {
-		c.AbortWithError(http.StatusUnprocessableEntity, err)
+	if err := c.ShouldBindBodyWithJSON(body); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
-	var client oauth2.Client
+	var client Client
 	client.Id = body.ClientId
 	client.ClientName = body.ClientName
-	client.Scope = strings.Join(body.Scope, " ")
+	client.ClientSecret, _ = internal.HashPassword(body.ClientSecret)
+	client.Scope = body.Scope
 	client.GrantTypes, _ = json.Marshal(body.GrantTypes)
 	client.RedirectUris, _ = json.Marshal(body.RedirectUris)
+	client.Audience, _ = json.Marshal("[]")
+	client.PostLogoutRedirectUris, _ = json.Marshal("[]")
 
 	db, err := database.ConnectMysql()
 	if err != nil {
@@ -38,7 +43,9 @@ func CreateClient(c *gin.Context) {
 	}
 
 	if result := db.Create(&client); result.Error != nil {
-		c.AbortWithError(http.StatusInternalServerError, result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
 		return
 	}
 

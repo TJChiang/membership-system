@@ -42,6 +42,9 @@ func CreateClient(c *gin.Context) {
 		panic(err)
 	}
 
+	sql, _ := db.DB()
+	defer sql.Close()
+	
 	if result := db.Create(&client); result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
@@ -49,8 +52,5 @@ func CreateClient(c *gin.Context) {
 		return
 	}
 
-	sql, _ := db.DB()
-
-	sql.Close()
 	c.JSON(http.StatusCreated, gin.H{})
 }

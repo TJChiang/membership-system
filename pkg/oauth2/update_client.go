@@ -34,6 +34,9 @@ func UpdateClient(c *gin.Context) {
 		panic(err)
 	}
 
+	sql, _ := db.DB()
+	defer sql.Close()
+
 	result := db.First(&client, "id = ?", id)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -56,9 +59,5 @@ func UpdateClient(c *gin.Context) {
 	client.PostLogoutRedirectUris, _ = json.Marshal("[]")
 
 	db.Save(&client)
-
-	sql, _ := db.DB()
-	sql.Close()
-
 	c.JSON(http.StatusOK, &client)
 }

@@ -18,7 +18,11 @@ func GetClient(c *gin.Context) {
 		})
 	}
 
+	sql, _ := db.DB()
+	defer sql.Close()
+
 	result := db.First(&client, "id = ?", id)
+
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),

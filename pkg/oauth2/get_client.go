@@ -16,21 +16,22 @@ func GetClient(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	sql, _ := db.DB()
 	defer sql.Close()
 
-	result := db.First(&client, "id = ?", id)
-
+	result := db.First(&client, id)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
+		return
 	}
-
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusNotFound, gin.H{})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

@@ -14,21 +14,22 @@ func GetClients(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
+		return
 	}
 
 	sql, _ := db.DB()
 	defer sql.Close()
 
-	result := db.First(&clients)
-
+	result := db.Find(&clients)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
+		return
 	}
-
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusNotFound, gin.H{})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

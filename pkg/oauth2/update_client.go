@@ -37,7 +37,7 @@ func UpdateClient(c *gin.Context) {
 	sql, _ := db.DB()
 	defer sql.Close()
 
-	result := db.First(&client, "id = ?", id)
+	result := db.First(&client, id)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
@@ -46,6 +46,7 @@ func UpdateClient(c *gin.Context) {
 	}
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusNotFound, gin.H{})
+		return
 	}
 
 	client.ClientName = body.ClientName

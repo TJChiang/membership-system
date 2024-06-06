@@ -15,3 +15,7 @@ type Client struct {
 	CreatedAt              int64          `gorm:"autoCreateTime"`
 	UpdatedAt              int64          `gorm:"autoUpdateTime"`
 }
+
+func (Client) TableName() string {
+	return "oauth2_client"
+}

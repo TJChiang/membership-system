@@ -25,7 +25,7 @@ func (dsnConfig *DSNConfig) FormatDSN() string {
 	)
 }
 
-func OpenMysqlDefault() (*gorm.DB, error) {
+func ConnectMysql() (*gorm.DB, error) {
 	dsn := &DSNConfig{
 		User:     os.Getenv("DATABASE_USER"),
 		Password: os.Getenv("DATABASE_ROOT_PASSWORD"),
@@ -34,8 +34,4 @@ func OpenMysqlDefault() (*gorm.DB, error) {
 		DBName:   os.Getenv("DATABASE_SCHEMA"),
 	}
 	return gorm.Open(mysql.Open(dsn.FormatDSN()), &gorm.Config{})
-}
-
-func OpenMysql(config DSNConfig) (*gorm.DB, error) {
-	return gorm.Open(mysql.Open(config.FormatDSN()), &gorm.Config{})
 }

@@ -2,7 +2,6 @@ package oauth2
 
 import (
 	"github.com/gin-gonic/gin"
-	"membership-system/api/oauth2"
 )
 
 func Routes(r *gin.Engine) {
@@ -10,7 +9,7 @@ func Routes(r *gin.Engine) {
 	// Clients
 	router.GET("/clients")
 	router.GET("/client/:client_id")
-	router.POST("/client", oauth2.CreateClient)
+	router.POST("/client", CreateClient)
 	router.PUT("/client/:client_id")
 	router.DELETE("/client/:client_id")
 

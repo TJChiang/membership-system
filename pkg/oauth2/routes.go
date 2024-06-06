@@ -11,7 +11,7 @@ func Routes(r *gin.Engine) {
 	router.GET("/client/:client_id", GetClient)
 	router.POST("/client", CreateClient)
 	router.PUT("/client/:client_id", UpdateClient)
-	router.DELETE("/client/:client_id")
+	router.DELETE("/client/:client_id", DeleteClient)
 
 	router.GET("/auth")
 }

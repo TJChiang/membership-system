@@ -1,9 +1,10 @@
-package user
+package dsebd
 
 import (
 	"github.com/gin-gonic/gin"
 	"membership-system/database"
 	"membership-system/internal"
+	user2 "membership-system/pkg/user"
 	"net/http"
 	"strings"
 	"time"
@@ -21,7 +22,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	var user User
+	var user user2.User
 	db, err := database.ConnectMysql()
 	if err != nil {
 		panic(err)
@@ -62,7 +63,7 @@ func Login(c *gin.Context) {
 	}
 
 	c.SetCookie(
-		"oauth2_session",
+		"sbcookie",
 		sessionKey,
 		int(expiration.Unix()),
 		"/",

@@ -1,13 +1,14 @@
 package user
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"membership-system/pkg"
+)
 
 func Routes(r *gin.Engine) {
 	router := r.Group("/user")
 
-	router.POST("/register", Register)
-	router.POST("/login", Login)
-	router.GET("/:id")
-	router.PUT("/role")
-	router.GET("/protected/admin")
+	router.GET("/:id", pkg.AuthenticationMiddleware)
+	router.PUT("/role", pkg.AuthenticationMiddleware)
+	router.GET("/protected/admin", pkg.AuthenticationMiddleware)
 }

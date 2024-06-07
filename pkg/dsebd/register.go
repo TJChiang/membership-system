@@ -1,9 +1,10 @@
-package user
+package dsebd
 
 import (
 	"github.com/gin-gonic/gin"
 	"membership-system/database"
 	"membership-system/internal"
+	user2 "membership-system/pkg/user"
 	"net/http"
 	"strings"
 )
@@ -23,7 +24,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	var user User
+	var user user2.User
 	hashPassword, err := internal.HashPassword(strings.TrimSpace(body.Password))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -35,7 +36,7 @@ func Register(c *gin.Context) {
 	user.Name = strings.TrimSpace(body.Username)
 	user.Email = strings.ToLower(strings.TrimSpace(body.Email))
 	user.Password = hashPassword
-	user.Role = Member.Value()
+	user.Role = user2.Member.Value()
 
 	db, err := database.ConnectMysql()
 	if err != nil {

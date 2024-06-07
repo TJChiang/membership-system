@@ -9,5 +9,6 @@ create table if not exists users
     role tinyint unsigned not null comment '角色 0:admin/1:moderator/2:member',
     created_at int unsigned not null default (unix_timestamp()),
     updated_at int unsigned not null default (unix_timestamp()),
-    primary key(id)
+    primary key(id),
+    unique (email)
 ) ENGINE=InnoDB default CHARSET=utf8mb4 collate=utf8mb4_unicode_ci comment '使用者';

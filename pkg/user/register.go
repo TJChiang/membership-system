@@ -5,11 +5,12 @@ import (
 	"membership-system/database"
 	"membership-system/internal"
 	"net/http"
+	"strings"
 )
 
 type RegisterRequest struct {
 	Username string `form:"username" json:"username" binding:"required"`
-	Email    string `form:"email" json:"email" binding:"required"`
+	Email    string `form:"email" json:"email" binding:"required,email"`
 	Password string `form:"password" json:"password" binding:"required"`
 }
 
@@ -23,7 +24,7 @@ func Register(c *gin.Context) {
 	}
 
 	var user User
-	hashPassword, err := internal.HashPassword(body.Password)
+	hashPassword, err := internal.HashPassword(strings.TrimSpace(body.Password))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -31,8 +32,8 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	user.Name = body.Username
-	user.Email = body.Email
+	user.Name = strings.TrimSpace(body.Username)
+	user.Email = strings.ToLower(strings.TrimSpace(body.Email))
 	user.Password = hashPassword
 	user.Role = Member.Value()
 

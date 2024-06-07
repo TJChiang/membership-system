@@ -10,5 +10,5 @@ func Routes(r *gin.Engine) {
 
 	router.POST("/register", Register)
 	router.POST("/login", Login)
-	router.GET("/me", pkg.AuthenticationMiddleware)
+	router.GET("/me", pkg.AuthenticationMiddleware, MyInfo)
 }

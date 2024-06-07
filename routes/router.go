@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"membership-system/pkg/dsebd"
 	"membership-system/pkg/oauth2"
 )
 
@@ -15,6 +16,7 @@ func SetupRoutes() *gin.Engine {
 	})
 
 	oauth2.Routes(router)
+	dsebd.Routes(router)
 
 	return router
 }

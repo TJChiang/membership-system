@@ -10,27 +10,24 @@
 
 ```mermaid
 sequenceDiagram
-    Actor User
-    participant CS as Client Service
+Actor User
+participant CS as Client Service
+participant MS as Membership System
 
-    box Membership System
-    participant AenS as Authentication Server
-    participant AorS as Authorization Server
-    participant RS as Resource Server
-    end
-
-    User ->> CS: Log in
-    CS ->> AenS: Authorization endpoint
-    AenS ->> User: Login Page
-    User ->> AenS: Authentication
-    AenS ->> User: Consent Page
-    User ->> AorS: Authorization
-    AorS ->> CS: redirect to "Redirect Uri" w. Code&State
-    CS ->> AorS: Request access token
-    AorS ->> CS: Access token
-    CS ->> RS: Request user info w. access token
-    RS ->> CS: User info
-    CS ->> User: Logged in
+User ->> CS: Log in
+CS ->> MS: Authorization endpoint
+opt If Need Authentication
+    MS ->> User: Login Page
+    User ->> MS: Authentication
+    MS ->> User: Consent Page
+    User ->> MS: Authorization
+end
+MS ->> CS: redirect to "Redirect Uri" w. Code + State
+CS ->> MS: Request access token
+MS ->> CS: Access token
+CS ->> MS: Request user info w. access token
+MS ->> CS: User info
+CS ->> User: Logged in
 ```
 
 ## TODO

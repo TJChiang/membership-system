@@ -1,5 +1,38 @@
 # 會員權限及 SSO 系統
 
+## 架構圖
+
+<img src="./internal/architecture.png" alt="drawing" style="width:600px;"/>
+
+## 循序圖
+
+### 登入
+
+```mermaid
+sequenceDiagram
+    Actor User
+    participant CS as Client Service
+
+    box Membership System
+    participant AenS as Authentication Server
+    participant AorS as Authorization Server
+    participant RS as Resource Server
+    end
+
+    User ->> CS: Log in
+    CS ->> AenS: Authorization endpoint
+    AenS ->> User: Login Page
+    User ->> AenS: Authentication
+    AenS ->> User: Consent Page
+    User ->> AorS: Authorization
+    AorS ->> CS: redirect to "Redirect Uri" w. Code&State
+    CS ->> AorS: Request access token
+    AorS ->> CS: Access token
+    CS ->> RS: Request user info w. access token
+    RS ->> CS: User info
+    CS ->> User: Logged in
+```
+
 ## TODO
 
 ### 會員註冊、認證、授權服務

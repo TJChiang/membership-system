@@ -10,7 +10,9 @@ import (
 )
 
 func RegisterPage(c *gin.Context) {
-	c.Redirect(http.StatusFound, "/bsebd/me")
+	c.HTML(http.StatusOK, "register.tmpl", gin.H{
+		"title": "Register",
+	})
 }
 
 type RegisterRequest struct {

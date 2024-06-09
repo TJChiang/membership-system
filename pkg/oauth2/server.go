@@ -29,21 +29,30 @@ func Serve() *server.Server {
 	manager.MapAccessGenerate(generates.NewAccessGenerate())
 
 	clientStore := store.NewClientStore()
-	clientStore.Set("alpha", &models.Client{
+	err := clientStore.Set("alpha", &models.Client{
 		ID:     "alpha",
 		Secret: "alpha-secret",
 		Domain: "http://alpha.local",
 	})
-	clientStore.Set("beta", &models.Client{
+	if err != nil {
+		panic(err)
+	}
+	err = clientStore.Set("beta", &models.Client{
 		ID:     "beta",
 		Secret: "beta-secret",
 		Domain: "http://beta.local",
 	})
-	clientStore.Set("delta", &models.Client{
+	if err != nil {
+		return nil
+	}
+	err = clientStore.Set("delta", &models.Client{
 		ID:     "delta",
 		Secret: "delta-secret",
-		Domain: "http://delta.local",
+		Domain: "http://localhost:8080",
 	})
+	if err != nil {
+		return nil
+	}
 	manager.MapClientStorage(clientStore)
 
 	srv := server.NewServer(server.NewConfig(), manager)

@@ -73,6 +73,8 @@ func AuthenticationMiddleware(c *gin.Context) {
 		return
 	}
 
+	defer redis.Close()
+
 	result, err := redis.Get(c, cookie.Value).Result()
 	if errors.Is(err, redis2.Nil) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "sbcookie not found"})

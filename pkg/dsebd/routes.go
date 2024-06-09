@@ -8,7 +8,9 @@ import (
 func Routes(r *gin.Engine) {
 	router := r.Group("/dsebd")
 
+	router.GET("/register", RegisterPage)
 	router.POST("/register", Register)
-	router.POST("/login", Login)
+	router.GET("/login", LoginPage)
+	router.GET("/consent", pkg.AuthenticationMiddleware, ConsentPage)
 	router.GET("/me", pkg.AuthenticationMiddleware, MyInfo)
 }

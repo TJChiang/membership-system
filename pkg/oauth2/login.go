@@ -1,61 +1,29 @@
-package dsebd
+package oauth2
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	redis2 "github.com/redis/go-redis/v9"
 	"membership-system/database"
 	"membership-system/internal"
-	user2 "membership-system/pkg/user"
+	model "membership-system/pkg/user"
 	"net/http"
 	"strings"
 	"time"
 )
 
-func LoginPage(c *gin.Context) {
-	cookie, err := c.Request.Cookie("sbcookie")
-	if err != nil {
-		c.HTML(http.StatusOK, "login.tmpl", gin.H{
-			"title": "Login",
-		})
-		return
-	}
-
-	redis, err := database.ConnectRedis()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		c.Abort()
-		return
-	}
-
-	_, err = redis.Get(c, cookie.Value).Result()
-	if errors.Is(err, redis2.Nil) {
-		c.HTML(http.StatusOK, "login.tmpl", gin.H{
-			"title": "Login",
-		})
-		c.Abort()
-		return
-	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		c.Abort()
-		return
-	}
-	c.Redirect(http.StatusFound, "/bsebd/me")
-}
-
 type loginRequest struct {
-	Username string `json:"username" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	Username string `form:"username" binding:"required,email"`
+	Password string `form:"password" binding:"required"`
 }
 
 func Login(c *gin.Context) {
 	var credentials loginRequest
-	if err := c.ShouldBindJSON(&credentials); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBind(&credentials); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		c.Abort()
 		return
 	}
 
-	var user user2.User
+	var user model.User
 	db, err := database.ConnectMysql()
 	if err != nil {
 		panic(err)
@@ -80,7 +48,6 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	rdb, err := database.ConnectRedis()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error connecting to redis"})
@@ -100,11 +67,11 @@ func Login(c *gin.Context) {
 		sessionKey,
 		int(expiration.Unix()),
 		"/",
-		"membership-dev.com",
+		".local",
 		false,
 		true,
 	)
 
 	// redirect to Authorization page
-	c.Redirect(http.StatusFound, "http://membership-dev.com/oauth2/consent")
+	c.Redirect(http.StatusFound, "/dsebd/consent")
 }

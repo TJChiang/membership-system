@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+func RegisterPage(c *gin.Context) {
+	c.Redirect(http.StatusFound, "/bsebd/me")
+}
+
 type RegisterRequest struct {
 	Username string `form:"username" json:"username" binding:"required"`
 	Email    string `form:"email" json:"email" binding:"required,email"`

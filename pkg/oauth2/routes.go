@@ -3,7 +3,6 @@ package oauth2
 import (
 	"github.com/gin-gonic/gin"
 	"membership-system/internal"
-	"membership-system/pkg"
 )
 
 func Routes(r *gin.Engine, container internal.Container) {
@@ -16,7 +15,8 @@ func Routes(r *gin.Engine, container internal.Container) {
 	router.PUT("/client/:client_id", UpdateClient)
 	router.DELETE("/client/:client_id", DeleteClient)
 
-	router.GET("/authorize", pkg.AuthenticationMiddleware, Authorize(container.OauthServer))
+	router.GET("/authorize", Authorize(container.OauthServer))
+	router.POST("/consent", Consent(container.OauthServer))
 	router.POST("/token", IssueToken(container.OauthServer))
 	router.POST("/login", Login)
 }

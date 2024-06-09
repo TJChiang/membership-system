@@ -10,6 +10,7 @@ import (
 	"github.com/go-oauth2/oauth2/v4/store"
 	oredis "github.com/go-oauth2/redis/v4"
 	"github.com/go-redis/redis/v8"
+	"github.com/go-session/session"
 	redis2 "github.com/redis/go-redis/v9"
 	"log"
 	"membership-system/database"
@@ -62,9 +63,22 @@ func Serve() *server.Server {
 	return srv
 }
 
+// auth endpoint 之後，確認登入身份
 func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string, err error) {
+	store, err := session.Start(r.Context(), w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	cookie, err := r.Cookie("sbcookie")
 	if err != nil {
+		if r.Form == nil {
+			r.ParseForm()
+		}
+		store.Set("authorize_info", r.Form)
+		store.Save()
+
 		w.Header().Set("Location", "/dsebd/login")
 		w.WriteHeader(http.StatusFound)
 		return
@@ -80,6 +94,12 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 
 	_, err = redis.Get(r.Context(), cookie.Value).Result()
 	if errors.Is(err, redis2.Nil) {
+		if r.Form == nil {
+			r.ParseForm()
+		}
+		store.Set("authorize_info", r.Form)
+		store.Save()
+
 		w.Header().Set("Location", "/dsebd/login")
 		w.WriteHeader(http.StatusFound)
 		return
@@ -88,5 +108,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 		return
 	}
 
+	w.Header().Set("Location", "/dsebd/me")
+	w.WriteHeader(http.StatusFound)
 	return
 }

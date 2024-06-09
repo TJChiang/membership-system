@@ -16,14 +16,14 @@ func RegisterPage(c *gin.Context) {
 }
 
 type RegisterRequest struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Email    string `form:"email" json:"email" binding:"required,email"`
-	Password string `form:"password" json:"password" binding:"required"`
+	Username string `form:"username" binding:"required"`
+	Email    string `form:"email" binding:"required,email"`
+	Password string `form:"password" binding:"required"`
 }
 
 func Register(c *gin.Context) {
 	body := &RegisterRequest{}
-	if err := c.ShouldBindBodyWithJSON(body); err != nil {
+	if err := c.ShouldBind(body); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
 			"error": err.Error(),
 		})

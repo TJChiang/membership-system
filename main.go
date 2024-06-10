@@ -1,29 +1,16 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
 	"github.com/gin-gonic/gin"
+	"github.com/go-session/session"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
-	goauth2 "golang.org/x/oauth2"
 	"membership-system/internal"
 	"membership-system/pkg"
 	"membership-system/pkg/dsebd"
 	"membership-system/pkg/oauth2"
 	"net/http"
-)
-
-var (
-	goauth2Config = goauth2.Config{
-		ClientID:     "delta",
-		ClientSecret: "delta-secret",
-		Scopes:       []string{"all"},
-		RedirectURL:  "http://localhost:8080/dsebd/callback",
-		Endpoint: goauth2.Endpoint{
-			AuthURL:  "http://localhost:8080/oauth2/authorize",
-			TokenURL: "http://localhost:8080/oauth2/token",
-		},
-	}
+	"strings"
 )
 
 func init() {
@@ -33,7 +20,7 @@ func init() {
 }
 
 func main() {
-	var container internal.Container
+	container := internal.NewContainer()
 
 	oauthServer := oauth2.Serve()
 
@@ -48,25 +35,22 @@ func main() {
 		})
 	})
 	router.GET("/", func(c *gin.Context) {
-		safe, err := internal.GenerateRandomStringURLSafe(16)
+		store, err := session.Start(c.Request.Context(), c.Writer, c.Request)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
-			})
-			c.Abort()
-			return
+			panic(err)
 		}
 
-		s256 := sha256.Sum256([]byte("s256example"))
-		challenge := base64.URLEncoding.EncodeToString(s256[:])
+		s := uuid.New().String()
+		state := strings.Replace(s, "-", "", -1)
 
-		u := goauth2Config.AuthCodeURL(safe,
-			goauth2.SetAuthURLParam("code_challenge", challenge),
-			goauth2.SetAuthURLParam("code_challenge_method", "S256"))
+		store.Set("state", state)
+		store.Save()
+
+		u := container.OauthClient.AuthCodeURL(state)
 		c.Redirect(http.StatusFound, u)
 	})
 	oauth2.Routes(router, container)
-	dsebd.Routes(router)
+	dsebd.Routes(router, container)
 
 	err := router.Run(":8080")
 

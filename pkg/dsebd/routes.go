@@ -2,10 +2,11 @@ package dsebd
 
 import (
 	"github.com/gin-gonic/gin"
+	"membership-system/internal"
 	"membership-system/pkg"
 )
 
-func Routes(r *gin.Engine) {
+func Routes(r *gin.Engine, container *internal.Container) {
 	router := r.Group("/dsebd")
 
 	router.GET("/register", RegisterPage)
@@ -13,5 +14,5 @@ func Routes(r *gin.Engine) {
 	router.GET("/login", LoginPage)
 	router.GET("/consent", ConsentPage)
 	router.GET("/me", pkg.AuthenticationMiddleware, MyInfo)
-	router.GET("/callback", OAuthCallback)
+	router.GET("/callback", OAuthCallback(container))
 }

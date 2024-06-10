@@ -5,7 +5,7 @@ import (
 	"membership-system/internal"
 )
 
-func Routes(r *gin.Engine, container internal.Container) {
+func Routes(r *gin.Engine, container *internal.Container) {
 	router := r.Group("/oauth2")
 
 	// Clients

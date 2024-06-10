@@ -20,8 +20,8 @@ func NewContainer() *Container {
 			Scopes:       []string{"all"},
 			RedirectURL:  appUrl + "/dsebd/callback",
 			Endpoint: oauth2.Endpoint{
-				AuthURL:  appUrl + "/oauth2/authorize",
-				TokenURL: appUrl + "/oauth2/token",
+				AuthURL:  appUrl + os.Getenv("AUTHORIZATION_ENDPOINT"),
+				TokenURL: appUrl + os.Getenv("TOKEN_ENDPOINT"),
 			},
 		},
 	}

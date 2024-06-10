@@ -19,4 +19,5 @@ func Routes(r *gin.Engine, container *internal.Container) {
 	router.POST("/consent", Consent(container.OauthServer))
 	router.POST("/token", IssueToken(container.OauthServer))
 	router.POST("/login", Login)
+	router.POST("/userinfo", Userinfo(container.OauthServer))
 }

@@ -12,6 +12,7 @@ import (
 	oredis "github.com/go-oauth2/redis/v4"
 	"github.com/go-redis/redis/v8"
 	"github.com/go-session/session"
+	"github.com/golang-jwt/jwt"
 	redis2 "github.com/redis/go-redis/v9"
 	"log"
 	"membership-system/database"
@@ -21,16 +22,26 @@ import (
 
 func Serve() *server.Server {
 	manager := manage.NewDefaultManager()
+
+	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
+
 	manager.MapTokenStorage(oredis.NewRedisStore(&redis.Options{
 		Addr: os.Getenv("REDIS_HOST"),
 		DB:   15,
 	}))
-	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
-	manager.MustTokenStorage(store.NewMemoryTokenStore())
-	manager.MapAccessGenerate(generates.NewAccessGenerate())
+	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("membership-secret"), jwt.SigningMethodHS512))
+	//manager.MapAccessGenerate(generates.NewAccessGenerate())
 
 	clientStore := store.NewClientStore()
-	err := clientStore.Set("alpha", &models.Client{
+	err := clientStore.Set("delta", &models.Client{
+		ID:     "delta",
+		Secret: "delta-secret",
+		Domain: "http://localhost:8080",
+	})
+	if err != nil {
+		panic(err)
+	}
+	err = clientStore.Set("alpha", &models.Client{
 		ID:     "alpha",
 		Secret: "alpha-secret",
 		Domain: "http://alpha.local",
@@ -44,20 +55,11 @@ func Serve() *server.Server {
 		Domain: "http://beta.local",
 	})
 	if err != nil {
-		return nil
-	}
-	err = clientStore.Set("delta", &models.Client{
-		ID:     "delta",
-		Secret: "delta-secret",
-		Domain: "http://localhost:8080",
-	})
-	if err != nil {
-		return nil
+		panic(err)
 	}
 	manager.MapClientStorage(clientStore)
 
 	srv := server.NewServer(server.NewConfig(), manager)
-	srv.SetAllowGetAccessRequest(true)
 	srv.SetClientInfoHandler(server.ClientFormHandler)
 
 	srv.SetUserAuthorizationHandler(userAuthorizeHandler)

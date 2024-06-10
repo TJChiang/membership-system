@@ -1,29 +1,29 @@
 package oauth2
 
 import (
-	"context"
+	"net/http"
+	"net/url"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-session/session"
-	"net/http"
-	"net/url"
 )
 
 func Consent(srv *server.Server) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		store, err := session.Start(context.Background(), c.Writer, c.Request)
+		store, err := session.Start(c.Request.Context(), c.Writer, c.Request)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
-			})
-			c.Abort()
+			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
 		var form url.Values
-		if v, ok := store.Get("authorize_info"); ok {
-			form = v.(url.Values)
+		v, ok := store.Get("authorize_info")
+		if !ok {
+			c.Redirect(http.StatusFound, "/")
+			return
 		}
+		form = v.(url.Values)
 		c.Request.Form = form
 
 		store.Delete("authorize_info")
@@ -31,10 +31,7 @@ func Consent(srv *server.Server) gin.HandlerFunc {
 
 		err = srv.HandleAuthorizeRequest(c.Writer, c.Request)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			c.Abort()
+			c.AbortWithError(http.StatusBadRequest, err)
 		}
 	}
 }

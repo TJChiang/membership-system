@@ -3,6 +3,7 @@ package dsebd
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	redis2 "github.com/redis/go-redis/v9"
 	"membership-system/database"
 	"membership-system/internal"
@@ -16,7 +17,7 @@ func LoginPage(c *gin.Context) {
 	cookie, err := c.Request.Cookie("sbcookie")
 	if err != nil {
 		c.HTML(http.StatusOK, "login.tmpl", gin.H{
-			"title": "Login",
+			"title":     "Login",
 			"login_url": "/oauth2/login",
 		})
 		return
@@ -29,10 +30,12 @@ func LoginPage(c *gin.Context) {
 		return
 	}
 
-	_, err = redis.Get(c, cookie.Value).Result()
+	defer redis.Close()
+
+	_, err = redis.Get(c.Request.Context(), cookie.Value).Result()
 	if errors.Is(err, redis2.Nil) {
 		c.HTML(http.StatusOK, "login.tmpl", gin.H{
-			"title": "Login",
+			"title":     "Login",
 			"login_url": "/oauth2/login",
 		})
 		c.Abort()
@@ -77,11 +80,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	sessionKey, err := internal.GenerateRandomStringURLSafe(32)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	sessionKey := uuid.New().String()
 
 	rdb, err := database.ConnectRedis()
 	if err != nil {
@@ -89,9 +88,11 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	defer rdb.Close()
+
 	ttl := 30 * time.Minute
 	expiration := time.Now().Add(ttl)
-	err = rdb.Set(c, sessionKey, user.Id, ttl).Err()
+	err = rdb.Set(c.Request.Context(), sessionKey, user.Id, ttl).Err()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error storing session"})
 		return

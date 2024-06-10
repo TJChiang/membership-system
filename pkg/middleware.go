@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-session/session"
 	redis2 "github.com/redis/go-redis/v9"
+	"log"
 	"membership-system/database"
 	"net/http"
 	"strings"
@@ -76,9 +77,11 @@ func AuthenticationMiddleware(c *gin.Context) {
 
 	defer redis.Close()
 
-	result, err := redis.Get(c, cookie.Value).Result()
+	log.Println("cookie value: ", cookie.Value)
+
+	result, err := redis.Get(c.Request.Context(), cookie.Value).Result()
 	if errors.Is(err, redis2.Nil) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "sbcookie not found"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "session not found"})
 		c.Abort()
 		return
 	} else if err != nil {

@@ -1,9 +1,7 @@
 package oauth2
 
 import (
-	"errors"
 	"log"
-	"membership-system/database"
 	"net/http"
 	"os"
 
@@ -17,7 +15,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/go-session/session"
 	"github.com/golang-jwt/jwt"
-	redis2 "github.com/redis/go-redis/v9"
 )
 
 func Serve() *server.Server {
@@ -83,45 +80,19 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 		return
 	}
 
-	log.Println("hi")
-	cookie, err := r.Cookie("sbcookie")
-	if err != nil {
+	uid, ok := store.Get("oauth2_subject")
+	if !ok {
 		if r.Form == nil {
 			r.ParseForm()
 		}
 		store.Set("authorize_info", r.Form)
 		store.Save()
 
-		w.Header().Set("Location", "/dsebd/login")
-		w.WriteHeader(http.StatusFound)
+		http.Redirect(w, r, "/dsebd/login", http.StatusFound)
 		return
 	}
 
-	redis, err := database.ConnectRedis()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	defer redis.Close()
-
-	_, err = redis.Get(r.Context(), cookie.Value).Result()
-	if errors.Is(err, redis2.Nil) {
-		if r.Form == nil {
-			r.ParseForm()
-		}
-		store.Set("authorize_info", r.Form)
-		store.Save()
-
-		w.Header().Set("Location", "/dsebd/login")
-		w.WriteHeader(http.StatusFound)
-		return
-	} else if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Location", "/dsebd/me")
-	w.WriteHeader(http.StatusFound)
+	log.Println("subject has logged in: ", uid)
+	http.Redirect(w, r, "/dsebd/me", http.StatusFound)
 	return
 }

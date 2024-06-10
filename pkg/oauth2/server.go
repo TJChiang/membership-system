@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	oerrors "github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/generates"
@@ -92,7 +93,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 		return
 	}
 
+	userID = strconv.Itoa(int(uid.(int64)))
 	log.Println("subject has logged in: ", uid)
-	http.Redirect(w, r, "/dsebd/me", http.StatusFound)
 	return
 }

@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-session/session"
@@ -10,7 +11,7 @@ import (
 
 func Consent(srv *server.Server) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		store, err := session.Start(c, c.Writer, c.Request)
+		store, err := session.Start(context.Background(), c.Writer, c.Request)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),

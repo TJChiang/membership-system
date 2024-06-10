@@ -17,7 +17,7 @@ var (
 		ClientID:     "delta",
 		ClientSecret: "delta-secret",
 		Scopes:       []string{"all"},
-		RedirectURL:  "http://localhost:8080/oauth2/callback",
+		RedirectURL:  "http://localhost:8080/dsebd/callback",
 		Endpoint: goauth2.Endpoint{
 			AuthURL:  "http://localhost:8080/oauth2/authorize",
 			TokenURL: "http://localhost:8080/oauth2/token",
@@ -25,11 +25,13 @@ var (
 	}
 )
 
-func main() {
+func init() {
 	if err := godotenv.Load(); err != nil {
 		panic("Error loading .env file")
 	}
+}
 
+func main() {
 	var container internal.Container
 
 	oauthServer := oauth2.Serve()

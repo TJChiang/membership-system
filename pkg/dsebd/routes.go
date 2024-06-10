@@ -13,4 +13,5 @@ func Routes(r *gin.Engine) {
 	router.GET("/login", LoginPage)
 	router.GET("/consent", pkg.AuthenticationMiddleware, ConsentPage)
 	router.GET("/me", pkg.AuthenticationMiddleware, MyInfo)
+	router.GET("/callback", OAuthCallback)
 }

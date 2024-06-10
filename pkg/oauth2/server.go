@@ -34,7 +34,7 @@ func Serve() *server.Server {
 	err := clientStore.Set("delta", &models.Client{
 		ID:     "delta",
 		Secret: "delta-secret",
-		Domain: "http://localhost:8080",
+		Domain: os.Getenv("APP_URL"),
 	})
 	if err != nil {
 		panic(err)
@@ -42,7 +42,7 @@ func Serve() *server.Server {
 	err = clientStore.Set("alpha", &models.Client{
 		ID:     "alpha",
 		Secret: "alpha-secret",
-		Domain: "http://alpha.local",
+		Domain: os.Getenv("ALPHA_URL"),
 	})
 	if err != nil {
 		panic(err)
@@ -50,7 +50,7 @@ func Serve() *server.Server {
 	err = clientStore.Set("beta", &models.Client{
 		ID:     "beta",
 		Secret: "beta-secret",
-		Domain: "http://beta.local",
+		Domain: os.Getenv("BETA_URL"),
 	})
 	if err != nil {
 		panic(err)

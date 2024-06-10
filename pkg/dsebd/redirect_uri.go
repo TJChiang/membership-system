@@ -58,9 +58,17 @@ func OAuthCallback(con *internal.Container) gin.HandlerFunc {
 			return
 		}
 
+		vToken, claims, err := internal.ParseAndValidateAccessToken(token.AccessToken)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"data":  c.Request.URL.Query(),
-			"token": token,
+			"data":     c.Request.URL.Query(),
+			"token":    token,
+			"claims":   claims,
+			"is_valid": vToken.Valid,
 		})
 	}
 }

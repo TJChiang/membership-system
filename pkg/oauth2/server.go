@@ -27,7 +27,9 @@ func Serve() *server.Server {
 		Addr: os.Getenv("REDIS_HOST"),
 		DB:   15,
 	}))
-	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("membership-secret"), jwt.SigningMethodHS512))
+
+	appSecret := os.Getenv("APP_SECRET")
+	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte(appSecret), jwt.SigningMethodHS512))
 	//manager.MapAccessGenerate(generates.NewAccessGenerate())
 
 	clientStore := store.NewClientStore()

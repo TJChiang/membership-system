@@ -30,6 +30,13 @@ MS ->> CS: User info
 CS ->> User: Logged in
 ```
 
+## Endpoint
+
+- Authorization Endpoint: `GET /oauth2/authorize`
+- Consent Endpoint: `GET /oauth2/consent`
+- Token Endpoint: `POST /oauth2/token`
+- Userinfo Endpoint: `POST /oauth2/userinfo`
+
 ## TODO
 
 ### 會員註冊、認證、授權服務

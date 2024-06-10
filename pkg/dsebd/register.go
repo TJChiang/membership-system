@@ -12,6 +12,7 @@ import (
 func RegisterPage(c *gin.Context) {
 	c.HTML(http.StatusOK, "register.tmpl", gin.H{
 		"title": "Register",
+		"register_url": "/dsebd/register",
 	})
 }
 

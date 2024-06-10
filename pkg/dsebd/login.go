@@ -17,6 +17,7 @@ func LoginPage(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusOK, "login.tmpl", gin.H{
 			"title": "Login",
+			"login_url": "/oauth2/login",
 		})
 		return
 	}
@@ -32,6 +33,7 @@ func LoginPage(c *gin.Context) {
 	if errors.Is(err, redis2.Nil) {
 		c.HTML(http.StatusOK, "login.tmpl", gin.H{
 			"title": "Login",
+			"login_url": "/oauth2/login",
 		})
 		c.Abort()
 		return

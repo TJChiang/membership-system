@@ -1,8 +1,12 @@
 package oauth2
 
 import (
-	"context"
 	"errors"
+	"log"
+	"membership-system/database"
+	"net/http"
+	"os"
+
 	oerrors "github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/go-oauth2/oauth2/v4/manage"
@@ -14,10 +18,6 @@ import (
 	"github.com/go-session/session"
 	"github.com/golang-jwt/jwt"
 	redis2 "github.com/redis/go-redis/v9"
-	"log"
-	"membership-system/database"
-	"net/http"
-	"os"
 )
 
 func Serve() *server.Server {
@@ -77,12 +77,13 @@ func Serve() *server.Server {
 
 // auth endpoint 之後，確認登入身份
 func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string, err error) {
-	store, err := session.Start(context.Background(), w, r)
+	store, err := session.Start(r.Context(), w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	log.Println("hi")
 	cookie, err := r.Cookie("sbcookie")
 	if err != nil {
 		if r.Form == nil {

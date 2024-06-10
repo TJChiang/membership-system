@@ -3,6 +3,7 @@ package pkg
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-session/session"
 	redis2 "github.com/redis/go-redis/v9"
 	"membership-system/database"
 	"net/http"
@@ -88,4 +89,16 @@ func AuthenticationMiddleware(c *gin.Context) {
 	c.Set("sbcookie", cookie.Value)
 	c.Set("user_id", result)
 	c.Next()
+}
+
+func SessionMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		_, err := session.Start(c.Request.Context(), c.Writer, c.Request)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to start session"})
+			return
+		}
+
+		c.Next()
+	}
 }

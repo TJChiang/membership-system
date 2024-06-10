@@ -7,6 +7,7 @@ import (
 	"github.com/joho/godotenv"
 	goauth2 "golang.org/x/oauth2"
 	"membership-system/internal"
+	"membership-system/pkg"
 	"membership-system/pkg/dsebd"
 	"membership-system/pkg/oauth2"
 	"net/http"
@@ -40,6 +41,7 @@ func main() {
 
 	router := gin.Default()
 	router.LoadHTMLGlob("./internal/templates/*.tmpl")
+	router.Use(pkg.SessionMiddleware())
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",

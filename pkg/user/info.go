@@ -11,7 +11,9 @@ func Info(c *gin.Context) {
 
 	suid, exists := c.Get("user_id")
 	if !exists {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "user info not found in context",
+		})
 		return
 	}
 

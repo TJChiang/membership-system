@@ -91,6 +91,7 @@ func AuthenticationMiddleware(c *gin.Context) {
 	}
 	c.Set("sbcookie", cookie.Value)
 	c.Set("user_id", result)
+	log.Println("[middleware]user_id", result)
 	c.Next()
 }
 

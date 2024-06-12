@@ -9,6 +9,7 @@ import (
 	"membership-system/pkg"
 	"membership-system/pkg/dsebd"
 	"membership-system/pkg/oauth2"
+	"membership-system/pkg/user"
 	"net/http"
 	"strings"
 )
@@ -51,6 +52,7 @@ func main() {
 	})
 	oauth2.Routes(router, container)
 	dsebd.Routes(router, container)
+	user.Routes(router, container)
 
 	err := router.Run(":8080")
 

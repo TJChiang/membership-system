@@ -60,6 +60,59 @@ func Middleware() gin.HandlerFunc {
 	}
 }
 
+func CheckGetMethod() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.Method == http.MethodGet {
+			if c.Request.Referer() != "www.svc.deltaww-energy.com" {
+				//c.JSON(http.StatusForbidden, gin.H{"error": "Invalid referer"})
+				//c.Abort()
+				//return
+				log.Print("Referer error, need to be http://www.svc.deltaww-energy.com ")
+			}
+
+			if strings.HasPrefix(c.Request.URL.Path, "/dsebd/sso/api/") {
+				c.Request.Header.Set("From", "hello@deltaww-energy.com")
+			}
+		}
+		c.Next()
+	}
+}
+
+func CheckPostAndPutMethod() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodPut {
+			if c.Request.Header.Get("X-DSEBD-AGENT") == "" {
+				//c.JSON(http.StatusForbidden, gin.H{"error": "X-DSEBD-AGENT header missing"})
+				//c.Abort()
+				//return
+				log.Println("X-DSEBD-AGENT header missing")
+			}
+			if c.Request.Header.Get("Content-Type") != "application/json" {
+				//c.JSON(http.StatusForbidden, gin.H{"error": "Invalid Content-Type"})
+				//c.Abort()
+				//return
+				log.Println("Invalid Content-Type")
+			}
+		}
+		c.Next()
+	}
+}
+
+func CheckDeleteMethod() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.Method == http.MethodDelete {
+			agent := c.Request.Header.Get("X-DSEBD-AGENT")
+			if agent != "alpha" && agent != "beta" {
+				//c.JSON(http.StatusForbidden, gin.H{"error": "Invalid X-DSEBD-AGENT value"})
+				//c.Abort()
+				//return
+				log.Println("Invalid X-DSEBD-AGENT value")
+			}
+		}
+		c.Next()
+	}
+}
+
 func AuthenticationMiddleware(c *gin.Context) {
 	cookie, err := c.Request.Cookie("sbcookie")
 	if err != nil {

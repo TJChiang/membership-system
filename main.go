@@ -29,7 +29,12 @@ func main() {
 
 	router := gin.Default()
 	router.LoadHTMLGlob("./internal/templates/*.tmpl")
-	router.Use(pkg.SessionMiddleware())
+	router.Use(
+		pkg.CheckGetMethod(),
+		pkg.CheckPostAndPutMethod(),
+		pkg.CheckDeleteMethod(),
+		pkg.SessionMiddleware(),
+	)
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",

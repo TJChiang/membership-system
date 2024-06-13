@@ -32,7 +32,6 @@ func OAuthCallback(con *internal.Container) gin.HandlerFunc {
 		}
 		sstate, exists := store.Get("state")
 		if !exists {
-			log.Println("state not found")
 			c.Redirect(http.StatusFound, "/")
 			return
 		}

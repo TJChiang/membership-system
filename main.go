@@ -30,9 +30,7 @@ func main() {
 	router := gin.Default()
 	router.LoadHTMLGlob("./internal/templates/*.tmpl")
 	router.Use(
-		pkg.CheckGetMethod(),
-		pkg.CheckPostAndPutMethod(),
-		pkg.CheckDeleteMethod(),
+		pkg.SetTimestamp(),
 		pkg.SessionMiddleware(),
 	)
 	router.GET("/ping", func(c *gin.Context) {
